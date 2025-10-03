@@ -17,3 +17,4 @@ foreach ($logs as $dealId => $events) {
 // Вывод JSON
 header('Content-Type: application/json; charset=utf-8');
 echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+?>
