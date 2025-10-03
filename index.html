@@ -2,28 +2,47 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Лог сделок</title>
+  <title>Лог сделок HR</title>
   <style>
     body { font-family: Arial; padding: 20px; }
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-bottom: 15px; border-radius: 6px; background-color: #4CAF50; color: white; border: none; }
+    button { padding: 10px 20px; margin-bottom: 15px; border-radius: 6px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
     button:hover { background-color: #45a049; }
     pre { background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 600px; overflow-y: auto; }
   </style>
 </head>
 <body>
   <h2>Лог сделок (JSON)</h2>
-  <button onclick="loadLog()">Показать JSON</button>
+  <button onclick="loadDeals()">Показать JSON</button>
   <pre id="output">Нажмите кнопку, чтобы получить данные...</pre>
 
   <script>
-    async function loadLog() {
+    async function loadDeals() {
       const output = document.getElementById("output");
       output.textContent = "Загрузка...";
 
       try {
-        const response = await fetch("get_deal_log.php");
+        const webhook = "https://dnk-labtest.bitrix24.ru/rest/1/wgpekxa1mk1ht13w/crm.deal.list.json";
+
+        const response = await fetch(webhook);
         const data = await response.json();
-        output.textContent = JSON.stringify(data, null, 2);
+
+        if (!data.result) {
+          output.textContent = "Нет данных или ошибка вебхука";
+          return;
+        }
+
+        // Формируем ассоциативный массив: ID сделки → стадия → кто сдвинул, когда
+        const result = {};
+        data.result.forEach(deal => {
+          result[deal.ID] = {};
+          result[deal.STAGE_ID] = {
+            user_id: deal.ASSIGNED_BY_ID,
+            user_name: deal.ASSIGNED_BY_ID, // Имя можно подгрузить через crm.user.get
+            date_time: deal.DATE_MODIFY
+          };
+        });
+
+        output.textContent = JSON.stringify(result, null, 2);
       } catch (err) {
         output.textContent = "Ошибка: " + err;
       }
