@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Лог сделок</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-bottom: 15px; border-radius: 6px; background-color: #4CAF50; color: white; border: none; }
+    button:hover { background-color: #45a049; }
+    pre { background: #f5f5f5; padding: 15px; border-radius: 8px; max-height: 600px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <h2>Лог сделок (JSON)</h2>
+  <button onclick="loadLog()">Показать JSON</button>
+  <pre id="output">Нажмите кнопку, чтобы получить данные...</pre>
+
+  <script>
+    async function loadLog() {
+      const output = document.getElementById("output");
+      output.textContent = "Загрузка...";
+
+      try {
+        const response = await fetch("get_deal_log.php");
+        const data = await response.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        output.textContent = "Ошибка: " + err;
+      }
+    }
+  </script>
+</body>
+</html>
